@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+
+# Environment variables (sensitive)
+.env
+
+# Logs
+*.log
+watcher.log
+ai_employee.log
+
+# Test artifacts
+test_watch_folder/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.history/
+*.tmp
