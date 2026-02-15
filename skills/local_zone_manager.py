@@ -285,7 +285,7 @@ class LocalZoneManager:
         processed_content = content + f"""
 \n\n## Local Zone Execution
 
-**Executed At**: {datetime.now(timezone.utc().isoformat()}
+**Executed At**: {datetime.now(timezone.utc).isoformat()}
 **Zone**: Local
 **Execution By**: Local Zone Manager
 **Security**: Sensitive operation executed locally

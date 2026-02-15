@@ -127,7 +127,7 @@ class CloudZoneManager:
         print(f"[CLOUD] Prepared task for local zone: {task_name}")
         return sync_file
 
-    def draft_content_in_cloud(self, topic, content_type='linkedin'):
+    def draft_content_in_cloud(self, topic, content=''):
         """
         Draft content in the cloud zone.
 
@@ -144,7 +144,7 @@ class CloudZoneManager:
         (self.cloud_vault / 'Drafts').mkdir(exist_ok=True)
 
         # Create draft content based on type
-        if content_type == 'linkedin':
+        if topic == 'linkedin':
             draft_content = f"""# LinkedIn Post Draft
 
 **Created**: {timestamp}
@@ -176,7 +176,7 @@ Next steps:
 
 **Created**: {timestamp}
 **Zone**: Cloud
-**Type**: {content_type}
+**Type**: {topic}
 
 ## Content
 
@@ -277,7 +277,7 @@ Next steps:
         with open(local_sync_file, 'w', encoding='utf-8') as f:
             f.write(sync_metadata + content)
 
-        print(f"[SYNC] Cloud → Local: {task_path.name}")
+        print(f"[SYNC] Cloud to Local: {task_path.name}")
         return local_sync_file
 
     def get_cloud_status(self):
@@ -315,7 +315,7 @@ def main():
 
     if args.draft:
         topic, content = args.draft
-        manager.draft_content_in_cloud(content, topic)
+        manager.draft_content_in_cloud(topic, content)
 
     if args.triage:
         task_path = Path(args.triage)
