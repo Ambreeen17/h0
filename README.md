@@ -455,8 +455,8 @@ Demonstrate unified personal + business automation.
 
 - **Constitution**: `.specify/memory/constitution.md` - Full requirements
 - **Platinum Verification**: `PLATINUM_TIER_VERIFICATION.md` - Platinum checklist
+- **Platinum Demo**: `PLATINUM_DEMO.md` - Complete 20-minute demo script
 - **Platinum Deployment**: `PLATINUM_DEPLOYMENT.md` - Cloud deployment guide
-- **Platinum Demo**: `PLATINUM_DEMO.md` - Complete demo flow
 - **Gold Verification**: `GOLD_TIER_VERIFICATION.md` - Gold checklist
 - **Silver Demo**: `SILVER_TIER_DEMO.md` - Business use case
 - **Scheduling**: `SCHEDULING.md` - Automation setup
