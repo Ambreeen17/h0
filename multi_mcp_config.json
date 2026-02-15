@@ -1,0 +1,83 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:\\HACKATHON 0"],
+      "description": "File system operations for AI Employee",
+      "capabilities": ["read", "write", "list", "move", "delete"],
+      "category": "storage"
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "description": "Persistent memory for AI Employee context",
+      "capabilities": ["store", "retrieve", "search"],
+      "category": "state"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "description": "GitHub integration for version control",
+      "capabilities": ["clone", "commit", "push", "pull", "create_pr"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "category": "development"
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "description": "Web search capability for research tasks",
+      "capabilities": ["search", "browse"],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      },
+      "category": "external_api"
+    },
+    "odoo": {
+      "command": "python",
+      "args": ["skills/odoo_mcp_server.py"],
+      "description": "Odoo accounting integration (Gold Tier)",
+      "capabilities": ["read_accounts", "create_invoice", "financial_reports"],
+      "env": {
+        "ODOO_URL": "${ODOO_URL}",
+        "ODOO_DB": "${ODOO_DB}",
+        "ODOO_USER": "${ODOO_USER}",
+        "ODOO_PASSWORD": "${ODOO_PASSWORD}"
+      },
+      "category": "accounting"
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "description": "Slack integration for notifications",
+      "capabilities": ["send_message", "create_channel", "list_channels"],
+      "env": {
+        "SLACK_TOKEN": "${SLACK_TOKEN}"
+      },
+      "category": "communication"
+    }
+  },
+  "serverCategories": {
+    "storage": ["filesystem"],
+    "state": ["memory"],
+    "development": ["github"],
+    "external_api": ["brave-search"],
+    "accounting": ["odoo"],
+    "communication": ["slack"]
+  },
+  "routingRules": {
+    "file_operations": "filesystem",
+    "context_storage": "memory",
+    "git_operations": "github",
+    "web_search": "brave-search",
+    "financial_data": "odoo",
+    "notifications": "slack"
+  },
+  "fallbackStrategy": {
+    "priority": ["filesystem", "memory", "github"],
+    "fallbackOnError": true,
+    "retryAttempts": 3,
+    "retryDelay": 1000
+  }
+}
