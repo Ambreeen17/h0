@@ -1,7 +1,7 @@
 # Weekly CEO Briefing
 
 **Week of**: 2026-02-09 to 2026-02-15
-**Generated**: 2026-02-15T22:23:49.178770+00:00
+**Generated**: 2026-02-15T22:26:57.559301+00:00
 **Tier**: Gold (Autonomous Employee Level)
 
 ---

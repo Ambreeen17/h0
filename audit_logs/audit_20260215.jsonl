@@ -1,0 +1,3 @@
+{"timestamp": "2026-02-15T22:27:51.909448+00:00", "level": "INFO", "action": "test_action", "status": "success", "details": {"test": "data"}, "hostname": "User-PC", "process_id": 8524}
+{"timestamp": "2026-02-15T22:27:51.912118+00:00", "level": "WARNING", "action": "test_warning", "status": "warning", "details": {"test": "warning data"}, "hostname": "User-PC", "process_id": 8524}
+{"timestamp": "2026-02-15T22:27:51.915668+00:00", "level": "ERROR", "action": "test_error", "status": "failed", "details": {"context": "testing", "error": "Test error", "traceback": "Traceback (most recent call last):\n  File \"C:\\HACKATHON 0\\skills\\audit_logger.py\", line 258, in main\n    raise Exception(\"Test error\")\nException: Test error\n"}, "hostname": "User-PC", "process_id": 8524}
