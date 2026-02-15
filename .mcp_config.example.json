@@ -1,0 +1,37 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:\\HACKATHON 0"],
+      "description": "File system operations for AI Employee"
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "description": "Persistent memory for AI Employee"
+    }
+  },
+  "mcpActions": {
+    "write_file": {
+      "enabled": true,
+      "description": "Write content to a file",
+      "requires_approval": false
+    },
+    "send_notification": {
+      "enabled": true,
+      "description": "Send desktop notification",
+      "requires_approval": false
+    },
+    "execute_command": {
+      "enabled": true,
+      "description": "Execute safe system commands",
+      "requires_approval": true,
+      "whitelist": ["echo", "date", "whoami", "pwd"]
+    },
+    "create_directory": {
+      "enabled": true,
+      "description": "Create directory structure",
+      "requires_approval": false
+    }
+  }
+}

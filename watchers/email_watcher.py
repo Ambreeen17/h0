@@ -1,0 +1,274 @@
+#!/usr/bin/env python3
+"""
+Email Watcher - Silver Tier Perception Layer
+
+Monitors an email inbox and creates structured task files for new emails.
+Provides multi-domain perception alongside FileSystemWatcher.
+
+Requirements:
+- imaplib: Built-in with Python
+- email: Built-in with Python
+- python-dotenv: pip install python-dotenv
+"""
+
+import imaplib
+import email
+import os
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+from email.header import decode_header
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Configuration
+IMAP_SERVER = os.getenv('IMAP_SERVER', 'imap.gmail.com')
+IMAP_PORT = int(os.getenv('IMAP_PORT', '993'))
+EMAIL_USER = os.getenv('EMAIL_USER')
+EMAIL_PASS = os.getenv('EMAIL_PASS')  # App password for Gmail
+VAULT_INBOX = os.getenv('VAULT_INBOX', 'AI_Employee_Vault/Inbox')
+CHECK_INTERVAL = int(os.getenv('EMAIL_CHECK_INTERVAL', '60'))  # seconds
+
+
+class EmailWatcher:
+    """Monitors email inbox and creates tasks for new emails."""
+
+    def __init__(self):
+        self.inbox_path = Path(VAULT_INBOX)
+        self.inbox_path.mkdir(parents=True, exist_ok=True)
+        self.processed_emails = set()
+        self.load_processed_emails()
+
+    def load_processed_emails(self):
+        """Load list of already processed email IDs."""
+        cache_file = Path('.email_cache.txt')
+        if cache_file.exists():
+            with open(cache_file, 'r') as f:
+                self.processed_emails = set(line.strip() for line in f if line.strip())
+
+    def save_processed_emails(self):
+        """Save list of processed email IDs."""
+        with open('.email_cache.txt', 'w') as f:
+            for email_id in self.processed_emails:
+                f.write(f"{email_id}\n")
+
+    def connect(self):
+        """Connect to email server."""
+        try:
+            mail = imaplib.IMAP4_SSL(IMAP_SERVER, IMAP_PORT)
+            mail.login(EMAIL_USER, EMAIL_PASS)
+            mail.select('INBOX')
+            return mail
+        except Exception as e:
+            print(f"[ERROR] Failed to connect to email server: {e}")
+            return None
+
+    def decode_email_header(self, header):
+        """Decode email header."""
+        if header is None:
+            return ""
+
+        decoded = []
+        for part, encoding in decode_header(header):
+            if isinstance(part, bytes):
+                decoded.append(part.decode(encoding or 'utf-8', errors='ignore'))
+            else:
+                decoded.append(str(part))
+        return ''.join(decoded)
+
+    def get_email_body(self, msg):
+        """Extract email body content."""
+        body = ""
+
+        if msg.is_multipart():
+            for part in msg.walk():
+                content_type = part.get_content_type()
+                content_disposition = str(part.get("Content-Disposition"))
+
+                if content_type == "text/plain" and "attachment" not in content_disposition:
+                    try:
+                        body = part.get_payload(decode=True).decode('utf-8', errors='ignore')
+                        break
+                    except:
+                        pass
+        else:
+            try:
+                body = msg.get_payload(decode=True).decode('utf-8', errors='ignore')
+            except:
+                body = str(msg.get_payload())
+
+        return body
+
+    def create_task_from_email(self, mail, email_id, msg):
+        """Create a task file from an email."""
+        timestamp = datetime.now(timezone.utc).isoformat()
+
+        # Extract email metadata
+        subject = self.decode_email_header(msg.get('Subject', '(No Subject)'))
+        sender = self.decode_email_header(msg.get('From', 'Unknown'))
+        date = msg.get('Date', 'Unknown')
+        body = self.get_email_body(msg)
+
+        # Truncate body if too long
+        if len(body) > 2000:
+            body = body[:2000] + "\n\n... [truncated]"
+
+        # Generate task filename
+        task_id = timestamp.replace(':', '-').replace('.', '-')[:19]
+        task_filename = f"task-email-{task_id}.md"
+        task_path = self.inbox_path / task_filename
+
+        # Create task content
+        task_content = f"""# New Email Detected
+
+**Created**: {timestamp}
+**Status**: pending
+**Type**: watcher-event
+**Source**: EmailWatcher
+**Priority**: medium
+
+## Email Information
+
+- **Email ID**: {email_id.decode()}
+- **From**: {sender}
+- **Subject**: {subject}
+- **Date**: {date}
+- **Folder**: INBOX
+
+## Email Body
+
+```
+{body}
+```
+
+## Description
+
+A new email has been detected in your inbox. This task requires review and processing.
+
+## Suggested Actions
+
+1. **Read**: Review the email content and determine importance
+2. **Categorize**: Identify email type (work, personal, newsletter, etc.)
+3. **Respond**: Draft response if needed (requires approval)
+4. **Archive**: Mark as done when processed
+
+## Context
+
+This task was automatically generated by the EmailWatcher. The watcher monitors your email inbox and creates tasks to ensure important messages are not missed.
+
+## Processing
+
+### AI Analysis
+*To be filled by Claude when processing this task*
+
+### Actions Taken
+*To be filled by Claude when processing this task*
+
+### Result
+*To be filled by Claude when processing this task*
+
+**Completed**: *To be filled*
+"""
+
+        # Write task file
+        with open(task_path, 'w', encoding='utf-8') as f:
+            f.write(task_content)
+
+        print(f"[✓] Email task created: {task_filename}")
+        print(f"    From: {sender}")
+        print(f"    Subject: {subject}")
+
+        # Mark as processed
+        self.processed_emails.add(email_id.decode())
+        self.save_processed_emails()
+
+    def check_new_emails(self):
+        """Check for new emails and create tasks."""
+        mail = self.connect()
+        if not mail:
+            return
+
+        try:
+            # Search for unread emails
+            status, messages = mail.search(None, 'UNSEEN')
+
+            if status != 'OK':
+                print("[INFO] No new emails found")
+                return
+
+            email_ids = messages[0].split()
+            print(f"[INFO] Found {len(email_ids)} new emails")
+
+            for email_id in email_ids:
+                if email_id in self.processed_emails:
+                    continue
+
+                # Fetch email
+                status, msg_data = mail.fetch(email_id, '(RFC822)')
+                if status == 'OK':
+                    raw_email = msg_data[0][1]
+                    msg = email.message_from_bytes(raw_email)
+
+                    # Create task
+                    self.create_task_from_email(mail, email_id, msg)
+
+        except Exception as e:
+            print(f"[ERROR] Error checking emails: {e}")
+        finally:
+            try:
+                mail.close()
+                mail.logout()
+            except:
+                pass
+
+
+def main():
+    """Main entry point for EmailWatcher."""
+    print("=" * 60)
+    print("Email Watcher - Silver Tier Perception Layer")
+    print("=" * 60)
+    print()
+
+    # Check configuration
+    if not EMAIL_USER or not EMAIL_PASS:
+        print("[ERROR] Email credentials not configured")
+        print("Please set EMAIL_USER and EMAIL_PASS in .env file")
+        print()
+        print("For Gmail:")
+        print("1. Enable 2-factor authentication")
+        print("2. Create an App Password: https://myaccount.google.com/apppasswords")
+        print("3. Use the App Password in EMAIL_PASS")
+        return
+
+    print(f"[CONFIG] IMAP Server: {IMAP_SERVER}:{IMAP_PORT}")
+    print(f"[CONFIG] Email: {EMAIL_USER}")
+    print(f"[CONFIG] Inbox: {VAULT_INBOX}")
+    print(f"[CONFIG] Check Interval: {CHECK_INTERVAL}s")
+    print()
+
+    watcher = EmailWatcher()
+
+    print("[START] EmailWatcher is now running...")
+    print("[INFO] Press Ctrl+C to stop")
+    print()
+
+    try:
+        import time
+        while True:
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking for new emails...")
+            watcher.check_new_emails()
+
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Waiting {CHECK_INTERVAL}s...")
+            time.sleep(CHECK_INTERVAL)
+
+    except KeyboardInterrupt:
+        print()
+        print("[STOP] Shutting down email watcher...")
+    except Exception as e:
+        print(f"[ERROR] Unexpected error: {e}")
+
+
+if __name__ == '__main__':
+    main()

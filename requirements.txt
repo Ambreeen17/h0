@@ -1,4 +1,4 @@
-# AI Employee - Bronze Tier Dependencies
+# AI Employee - Silver Tier Dependencies
 
 # File System Watching
 watchdog>=4.0.0
@@ -8,6 +8,8 @@ python-dotenv>=1.0.0
 
 # File Operations (for robustness)
 pathlib2>=2.3.0
+
+# Email Watching (built-in imaplib, but email standard lib used)
 
 # Optional: For enhanced file type detection
 python-magic>=0.4.27; sys_platform != 'win32'
