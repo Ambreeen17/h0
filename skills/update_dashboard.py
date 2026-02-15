@@ -111,7 +111,7 @@ class DashboardUpdater:
             processing_text = "*No tasks currently being processed.\n"
 
         # Determine health status
-        health_status = "✅"
+        health_status = "[OK]"
         health_issues = []
 
         if not self.inbox_path.exists():
@@ -122,7 +122,7 @@ class DashboardUpdater:
             health_issues.append("Done folder missing")
 
         if health_issues:
-            health_status = "⚠️"
+            health_status = "[WARN]"
 
         dashboard_content = f"""# AI Employee Dashboard
 
@@ -225,7 +225,7 @@ This dashboard provides real-time visibility into the AI Employee's state.
             with open(self.dashboard_path, 'w', encoding='utf-8') as f:
                 f.write(new_content)
 
-            print(f"[✓] Dashboard updated: {self.dashboard_path}")
+            print(f"[OK] Dashboard updated: {self.dashboard_path}")
             print(f"    Inbox: {self.count_tasks(self.inbox_path)} | "
                   f"Needs Action: {self.count_tasks(self.needs_action_path)} | "
                   f"Done: {self.count_tasks(self.done_path)}")

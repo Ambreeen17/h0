@@ -160,17 +160,17 @@ class PlanGenerator:
 
 ## Execution Plan
 
-## Phase 1: Preparation
+### Phase 1: Preparation
 
 - [ ] **P1**: Review task requirements and context
 - [ ] **P2**: Identify required resources and tools
 - [ ] **P3**: Define success criteria
 
-## Phase 2: Execution
+### Phase 2: Execution
 
 {chr(10).join(f"- [ ] **{i+1}**: {step}" for i, step in enumerate(steps))}
 
-## Phase 3: Verification
+### Phase 3: Verification
 
 - [ ] **V1**: Review completed work against requirements
 - [ ] **V2**: Test and validate results
@@ -276,7 +276,7 @@ Update this plan as execution progresses to maintain accurate tracking.*
         with open(plan_path, 'w', encoding='utf-8') as f:
             f.write(plan_content)
 
-        print(f"[✓] Plan created: {plan_filename} (complexity: {complexity['score']})")
+        print(f"[OK] Plan created: {plan_filename} (complexity: {complexity['score']})")
 
         return plan_path
 

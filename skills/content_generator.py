@@ -240,7 +240,7 @@ Move this file to Published folder and update with:
 
         filepath.write_text(content, encoding='utf-8')
 
-        print(f"[✓] Draft saved: {filename}")
+        print(f"[OK] Draft saved: {filename}")
         print(f"[INFO] Topic: {post['topic']}")
         print(f"[INFO] Tone: {post['tone']}")
 
@@ -342,7 +342,7 @@ Update this calendar as posts are published and track performance metrics.
 
         calendar_path.write_text(content, encoding='utf-8')
 
-        print(f"[✓] Content calendar created: {calendar_path.name}")
+        print(f"[OK] Content calendar created: {calendar_path.name}")
         print(f"[INFO] {weeks} weeks, {post_num-1} posts planned")
 
         return calendar_path
@@ -371,7 +371,7 @@ def main():
     post = generator.generate_post(args.topic, args.tone)
     filepath = generator.save_draft(post)
 
-    print(f"\n[✓] Draft saved to: {filepath}")
+    print(f"\n[OK] Draft saved to: {filepath}")
     print(f"[INFO] Ready for review and publishing!")
 
 
