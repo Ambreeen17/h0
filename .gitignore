@@ -19,6 +19,8 @@ ai_employee.log
 
 # Test artifacts
 test_watch_folder/
+mcp-test-dir/
+mcp-test-output.txt
 
 # IDE
 .vscode/
