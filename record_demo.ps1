@@ -377,7 +377,7 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host "Demo Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "📸 Screenshots saved to: $ScreenshotDir" -ForegroundColor Cyan
+Write-Host 'Screenshots saved to: $ScreenshotDir' -ForegroundColor Cyan
 Write-Host "🎬 STOP YOUR SCREEN RECORDING NOW!" -ForegroundColor Red
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
@@ -385,5 +385,5 @@ Write-Host "1. Edit your screen recording" -ForegroundColor White
 Write-Host "2. Add voice narration using the script" -ForegroundColor White
 Write-Host "3. Export as MP4 for submission" -ForegroundColor White
 Write-Host ""
-Write-Host "Demo duration: ~20 minutes" -ForegroundColor Cyan
+Write-Host 'Demo duration: ~20 minutes' -ForegroundColor Cyan
 Write-Host ""
