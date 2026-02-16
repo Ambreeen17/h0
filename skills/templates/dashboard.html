@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Employee Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .status-bar {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .last-update {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .metric-card h3 {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .metric-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-card .change {
+            font-size: 0.85em;
+            opacity: 0.7;
+        }
+
+        .queues-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .queue-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .queue-card h2 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .queue-icon {
+            font-size: 1.5em;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-left: 3px solid #60a5fa;
+            transition: background 0.3s;
+        }
+
+        .task-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .task-meta {
+            font-size: 0.85em;
+            opacity: 0.7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            opacity: 0.6;
+        }
+
+        .zones-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 30px;
+        }
+
+        .zones-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .zone-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #60a5fa;
+        }
+
+        .zone-card.cloud {
+            border-left-color: #f59e0b;
+        }
+
+        .zone-card.local {
+            border-left-color: #10b981;
+        }
+
+        .zone-card.sync {
+            border-left-color: #8b5cf6;
+        }
+
+        .zone-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .zone-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .zone-stat:last-child {
+            border-bottom: none;
+        }
+
+        .activity-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .activity-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .activity-item {
+            padding: 12px 15px;
+            border-left: 3px solid #60a5fa;
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .activity-action {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 0.85em;
+            opacity: 0.7;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .queues-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Employee Dashboard</h1>
+            <div class="subtitle">Platinum Tier - Production Hybrid Architecture</div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>System Online</span>
+            </div>
+            <div class="last-update">
+                Last updated: <span id="lastUpdate">Loading...</span>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>Tasks Completed</h3>
+                <div class="value" id="tasksCompleted">-</div>
+                <div class="change">Total processed</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>Completion Rate</h3>
+                <div class="value" id="completionRate">-</div>
+                <div class="change">System efficiency</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>In Queue</h3>
+                <div class="value" id="tasksInQueue">-</div>
+                <div class="change">Awaiting processing</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>Pending Approvals</h3>
+                <div class="value" id="pendingApprovals">-</div>
+                <div class="change">Require authorization</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>Cloud Drafts</h3>
+                <div class="value" id="cloudDrafts">-</div>
+                <div class="change">Cloud zone activity</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>System Status</h3>
+                <div class="value" style="font-size: 1.8em;">✅ Active</div>
+                <div class="change">All systems operational</div>
+            </div>
+        </div>
+
+        <div class="zones-section">
+            <h2>🌐 Zone Status</h2>
+            <div class="zones-grid">
+                <div class="zone-card cloud">
+                    <h3>☁️ Cloud Zone</h3>
+                    <div class="zone-stat">
+                        <span>Tasks</span>
+                        <span id="cloudTasks">-</span>
+                    </div>
+                    <div class="zone-stat">
+                        <span>Drafts</span>
+                        <span id="cloudDraftsZone">-</span>
+                    </div>
+                    <div class="zone-stat">
+                        <span>Status</span>
+                        <span style="color: #10b981;">Active</span>
+                    </div>
+                </div>
+
+                <div class="zone-card local">
+                    <h3>💻 Local Zone</h3>
+                    <div class="zone-stat">
+                        <span>Completed</span>
+                        <span id="localCompleted">-</span>
+                    </div>
+                    <div class="zone-stat">
+                        <span>Approvals Pending</span>
+                        <span id="localApprovals">-</span>
+                    </div>
+                    <div class="zone-stat">
+                        <span>Status</span>
+                        <span style="color: #10b981;">Active</span>
+                    </div>
+                </div>
+
+                <div class="zone-card sync">
+                    <h3>🔄 Sync Queue</h3>
+                    <div class="zone-stat">
+                        <span>Queue Size</span>
+                        <span id="syncQueue">-</span>
+                    </div>
+                    <div class="zone-stat">
+                        <span>Status</span>
+                        <span style="color: #10b981;">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="queues-section">
+            <div class="queue-card">
+                <h2><span class="queue-icon">📥</span> Needs Action</h2>
+                <ul class="task-list" id="needsActionList">
+                    <div class="loading">Loading...</div>
+                </ul>
+            </div>
+
+            <div class="queue-card">
+                <h2><span class="queue-icon">✅</span> Recently Completed</h2>
+                <ul class="task-list" id="doneList">
+                    <div class="loading">Loading...</div>
+                </ul>
+            </div>
+        </div>
+
+        <div class="activity-section">
+            <h2>📊 Recent Activity</h2>
+            <div id="activityList">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatTimestamp(isoString) {
+            const date = new Date(isoString);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+            return date.toLocaleDateString();
+        }
+
+        function updateMetrics() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    // Update metrics
+                    document.getElementById('tasksCompleted').textContent = data.metrics.total_completed;
+                    document.getElementById('completionRate').textContent = data.metrics.completion_rate + '%';
+                    document.getElementById('tasksInQueue').textContent = data.metrics.tasks_in_queue;
+                    document.getElementById('pendingApprovals').textContent = data.metrics.pending_approvals;
+                    document.getElementById('cloudDrafts').textContent = data.metrics.cloud_drafts;
+
+                    // Update zones
+                    document.getElementById('cloudTasks').textContent = data.zones.cloud.tasks;
+                    document.getElementById('cloudDraftsZone').textContent = data.zones.cloud.drafts;
+                    document.getElementById('localCompleted').textContent = data.zones.local.completed;
+                    document.getElementById('localApprovals').textContent = data.zones.local.pending_approvals;
+                    document.getElementById('syncQueue').textContent = data.zones.sync.queue_size;
+
+                    // Update timestamp
+                    document.getElementById('lastUpdate').textContent = formatTimestamp(data.timestamp);
+                })
+                .catch(error => console.error('Error fetching status:', error));
+        }
+
+        function updateTaskQueues() {
+            // Fetch needs_action queue
+            fetch('/api/tasks/needs_action')
+                .then(response => response.json())
+                .then(tasks => {
+                    const list = document.getElementById('needsActionList');
+                    if (tasks.length === 0) {
+                        list.innerHTML = '<div class="empty-state">✨ No tasks waiting</div>';
+                    } else {
+                        list.innerHTML = tasks.map(task => `
+                            <li class="task-item">
+                                <div class="task-title">${task.title}</div>
+                                <div class="task-meta">${formatTimestamp(task.timestamp)} • ${task.size} bytes</div>
+                            </li>
+                        `).join('');
+                    }
+                })
+                .catch(error => console.error('Error fetching tasks:', error));
+
+            // Fetch done queue
+            fetch('/api/tasks/done')
+                .then(response => response.json())
+                .then(tasks => {
+                    const list = document.getElementById('doneList');
+                    if (tasks.length === 0) {
+                        list.innerHTML = '<div class="empty-state">No completed tasks yet</div>';
+                    } else {
+                        list.innerHTML = tasks.slice(0, 5).map(task => `
+                            <li class="task-item">
+                                <div class="task-title">${task.title}</div>
+                                <div class="task-meta">${formatTimestamp(task.timestamp)}</div>
+                            </li>
+                        `).join('');
+                    }
+                })
+                .catch(error => console.error('Error fetching done tasks:', error));
+        }
+
+        function updateActivity() {
+            fetch('/api/activity')
+                .then(response => response.json())
+                .then(activities => {
+                    const list = document.getElementById('activityList');
+                    if (activities.length === 0) {
+                        list.innerHTML = '<div class="empty-state">No recent activity</div>';
+                    } else {
+                        list.innerHTML = activities.slice(0, 10).map(activity => `
+                            <div class="activity-item">
+                                <div class="activity-action">${activity.action}</div>
+                                <div class="activity-time">${formatTimestamp(activity.timestamp)} • ${activity.status}</div>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => console.error('Error fetching activity:', error));
+        }
+
+        // Initial load
+        updateMetrics();
+        updateTaskQueues();
+        updateActivity();
+
+        // Auto-refresh every 2 seconds
+        setInterval(() => {
+            updateMetrics();
+            updateTaskQueues();
+            updateActivity();
+        }, 2000);
+    </script>
+</body>
+</html>
