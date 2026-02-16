@@ -73,7 +73,7 @@ class ZoneSyncManager:
         target_path = Path(to_zone) / task_path.name
         task_path.rename(target_path)
 
-        print(f"[CLAIM] Task {task_path.name}: {from_zone} → {to_zone}")
+        print(f"[CLAIM] Task {task_path.name}: {from_zone} -> {to_zone}")
         print(f"[INFO] Claim file: {claim_file.name}")
 
         return claim_file, target_path
@@ -127,7 +127,7 @@ class ZoneSyncManager:
         with open(receipt_file, 'w', encoding='utf-8') as f:
             json.dump(receipt, f, indent=2)
 
-        print(f"[SYNC] {source_path.name}: {source_path.parent.parent.name} → {dest_zone}")
+        print(f"[SYNC] {source_path.name}: {source_path.parent.parent.name} -> {dest_zone}")
         print(f"[INFO] Size: {file_size} bytes, MD5: {receipt['checksum'][:8]}...")
 
         return dest_path
