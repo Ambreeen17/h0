@@ -16,13 +16,30 @@ Security Rules:
 
 Requirements:
 - python-dotenv: pip install python-dotenv
+
+Author: AI Employee Vault Team
+Version: 1.1.0
 """
 
 import os
+import sys
 import json
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Dict, Optional, Tuple, Any
 from dotenv import load_dotenv
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('local_zone.log'),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -44,17 +61,39 @@ APPROVAL_THRESHOLDS = {
 }
 
 
+class LocalZoneError(Exception):
+    """Base exception for local zone errors."""
+    pass
+
+
+class ApprovalNotFoundError(LocalZoneError):
+    """Raised when approval request is not found."""
+    pass
+
+
+class TaskExecutionError(LocalZoneError):
+    """Raised when task execution fails."""
+    pass
+
+
 class LocalZoneManager:
     """Manages local-zone secure operations."""
 
     def __init__(self):
-        self.sync_dir = LOCAL_ZONE_SYNC
-        self.sync_dir.mkdir(parents=True, exist_ok=True)
-        self.local_vault = LOCAL_VAULT
+        """Initialize local zone manager and create necessary directories."""
+        try:
+            self.sync_dir = LOCAL_ZONE_SYNC
+            self.sync_dir.mkdir(parents=True, exist_ok=True)
+            self.local_vault = LOCAL_VAULT
 
-        # Ensure approval folders exist
-        for folder in [APPROVED_FOLDER, REJECTED_FOLDER, PENDING_APPROVAL]:
-            folder.mkdir(parents=True, exist_ok=True)
+            # Ensure approval folders exist
+            for folder in [APPROVED_FOLDER, REJECTED_FOLDER, PENDING_APPROVAL]:
+                folder.mkdir(parents=True, exist_ok=True)
+
+            logger.info("Local Zone Manager initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize Local Zone Manager: {e}")
+            raise LocalZoneError(f"Initialization failed: {e}")
 
     def process_synced_task(self, sync_file):
         """
