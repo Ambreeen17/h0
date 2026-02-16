@@ -1,0 +1,8 @@
+{
+  "task_name": "email_customer_q1.md",
+  "type": "email-event",
+  "priority": "high",
+  "zone_recommendation": "local",
+  "reason": "Email processing - privacy considerations",
+  "triaged_at": "2026-02-15T23:39:28.454118+00:00"
+}
